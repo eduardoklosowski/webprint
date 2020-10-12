@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Send Print" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <section id="content">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+        {{ form }}
+        {{ form_imgs }}
+        <tr>
+          <td class="actions" colspan="2">
+            <button type="submit">{% translate "Send Print" %}</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </section>
+{% endblock %}

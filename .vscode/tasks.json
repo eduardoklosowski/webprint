@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "group": "none",
+      "label": "Make Migrations",
+      "type": "shell",
+      "command": "read -r; eval $REPLY; DEBUG=True python manage.py makemigrations",
+      "problemMatcher": []
+    },
+    {
+      "group": "none",
+      "label": "Migrate",
+      "type": "shell",
+      "command": "read -r; eval $REPLY; DEBUG=True python manage.py migrate",
+      "problemMatcher": []
+    },
+    {
+      "group": "none",
+      "label": "Make Messages",
+      "type": "shell",
+      "command": "read -r; eval $REPLY; DEBUG=True python manage.py makemessages -a",
+      "problemMatcher": []
+    },
+    {
+      "group": "none",
+      "label": "Compile Messages",
+      "type": "shell",
+      "command": "read -r; eval $REPLY; DEBUG=True python manage.py compilemessages",
+      "problemMatcher": []
+    },
+    {
+      "group": "none",
+      "label": "Collect Static",
+      "type": "shell",
+      "command": "read -r; eval $REPLY; DEBUG=True python manage.py collectstatic",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+# IDE
+/.vscode/settings.json
+
+# Python
+/env
+*.py[cod]
+__pycache__/
+*.egg-info
+/dist/
+
+# Env
+/.env
+/db.sqlite3
+/staticfiles/
+/mediafiles/

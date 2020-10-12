@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+  <section id="content" class="print-list">
+    {% for print in print_list %}
+      <div class="print">
+        <div class="print-header">
+          <a href="{% url 'webprint:print' print.id %}">
+            <div class="print-name">{{ print.name }}</div>
+          </a>
+          <div class="print-time">
+            {% blocktranslate with time=print.pub_date|timesince expires=print.get_expires_in_display %}Submitted {{ time }} ago, expires in {{ expires }}{% endblocktranslate %}
+          </div>
+        </div>
+        <div class="print-imgs">
+          {% for img in print.imgs.all %}
+            <a class="print-img" href="{{ img.img.url }}" target="_blank">
+              <img src="{{ img.img.url }}" alt="{{ img.img.name }}">
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    {% if page_obj.paginator.num_pages != 1 %}
+      <div class="pagination">
+        <span class="step-links">
+          {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; {% translate "first" %}</a>
+            <a href="?page={{ page_obj.previous_page_number }}">{% translate "previous" %}</a>
+          {% endif %}
+
+          <span class="current">
+            {% blocktranslate with page=page_obj.number total=page_obj.paginator.num_pages %}Page {{ page }} of {{ total }}{% endblocktranslate %}
+          </span>
+
+          {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">{% translate "next" %}</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">{% translate "last" %} &raquo;</a>
+          {% endif %}
+        </span>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

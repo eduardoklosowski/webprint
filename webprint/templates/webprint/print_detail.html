@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ print.name }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+  <section id="content" class="print">
+    <a href="{% url 'webprint:print' print.id %}"><h1 class="print-name">{{ print.name }}</h1></a>
+    <div class="print-time">
+      {% blocktranslate with time=print.pub_date|timesince expires=print.get_expires_in_display %}Submitted {{ time }} ago, expires in {{ expires }}{% endblocktranslate %}
+    </div>
+    {% if print.desc %}
+      <div class="print-desc">{{ print.desc | linebreaksbr }}</div>
+    {% endif %}
+
+    <div class="print-imgs">
+      {% for img in print.imgs.all %}
+        <a class="print-img" href="{{ img.img.url }}" target="_blank">
+          <img src="{{ img.img.url }}" alt="{{ img.img.name }}">
+        </a>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

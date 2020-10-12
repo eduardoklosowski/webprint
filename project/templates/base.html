@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% load i18n %}
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}WebPrint{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'base.css' %}">
+  </head>
+  <body>
+    <header>
+      <h1><a href="{% url 'webprint:home' %}">WebPrint</a></h1>
+      <a class="new" href="{% url 'webprint:print_add' %}">{% translate "Send Print" %}</a>
+    </header>
+    {% block content %}{% endblock %}
+  </body>
+</html>
