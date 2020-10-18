@@ -1,0 +1,37 @@
+FROM python:3.8-slim-buster AS builder
+
+RUN pip install 'poetry>=1.0.0,<2'
+
+RUN mkdir /webprint
+WORKDIR /webprint
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry export -E pgsql > requirements.txt
+
+
+# Image
+
+FROM python:3.8-slim-buster
+
+ENV PYTHONUNBUFFERED=1
+
+RUN pip install 'gunicorn>=20.0.0,<21'
+
+RUN mkdir /webprint
+WORKDIR /webprint
+
+COPY --from=builder /webprint/requirements.txt ./
+RUN pip install -r requirements.txt
+
+ENV DATABASE_URL=sqlite:////webprint/data/db.sqlite3 \
+    MEDIA_ROOT=/webprint/data/mediafiles
+
+COPY project ./project
+COPY webprint ./webprint
+COPY manage.py ./
+RUN python -m compileall . \
+ && mkdir data
+
+EXPOSE 8000
+
+CMD ["gunicorn", "project.wsgi", "-b", "0.0.0.0:8000", "--access-logfile", "-", "--error-logfile", "-"]

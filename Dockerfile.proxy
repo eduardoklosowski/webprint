@@ -1,0 +1,26 @@
+FROM python:3.8-slim-buster AS builder
+
+RUN pip install 'poetry>=1.0.0,<2'
+
+RUN mkdir /webprint
+WORKDIR /webprint
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry export > requirements.txt \
+ && pip install -r requirements.txt
+
+COPY project ./project
+COPY webprint ./webprint
+COPY manage.py ./
+RUN DEBUG=True ./manage.py collectstatic
+
+
+# Image
+
+FROM nginx:1.19-alpine
+
+RUN mkdir /webprint
+WORKDIR /webprint
+
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY --from=builder /webprint/staticfiles ./staticfiles/
