@@ -1,0 +1,10 @@
+host: ""
+
+proxy:
+  replicaCount: 1
+
+backend:
+  replicaCount: 1
+  secretKey: ""
+  #languageCode: pt-br
+  #timeZone: America/Sao_Paulo

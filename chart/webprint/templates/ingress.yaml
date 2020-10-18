@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "webprint.fullname" . }}
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+spec:
+  defaultBackend:
+    service:
+      name: {{ include "webprint.fullname" . }}-proxy
+      port:
+        number: 80
+  rules:
+    - host: {{ .Values.host }}

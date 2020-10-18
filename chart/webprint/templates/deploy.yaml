@@ -1,0 +1,176 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webprint.fullname" . }}-proxy
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: proxy
+spec:
+  replicas: {{ .Values.proxy.replicaCount }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "webprint.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/tier: proxy
+  template:
+    metadata:
+      name: {{ include "webprint.fullname" . }}-proxy
+      labels:
+        {{- include "webprint.labels" . | nindent 8 }}
+        app.kubernetes.io/tier: proxy
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: proxy
+          image: {{ .Values.images.proxy }}
+          imagePullPolicy: Always
+          env:
+            - name: BACKEND_URL
+              value: http://{{ include "webprint.fullname" . }}-backend:8000/
+          ports:
+            - protocol: TCP
+              containerPort: 80
+          volumeMounts:
+            - name: mediafiles
+              mountPath: /webprint/data/mediafiles
+              readOnly: true
+          startupProbe:
+            httpGet:
+              port: 80
+              path: /static/base.css
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /static/base.css
+            failureThreshold: 3
+            periodSeconds: 20
+      volumes:
+        - name: mediafiles
+          persistentVolumeClaim:
+            claimName: {{ include "webprint.fullname" . }}-mediafiles-claim
+            readOnly: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webprint.fullname" . }}-backend
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "webprint.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/tier: backend
+  template:
+    metadata:
+      name: {{ include "webprint.fullname" . }}-backend
+      labels:
+        {{- include "webprint.labels" . | nindent 8 }}
+        app.kubernetes.io/tier: backend
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: backend
+          image: {{ .Values.images.backend }}
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: {{ include "webprint.fullname" . }}-backend
+            - configMapRef:
+                name: {{ include "webprint.fullname" . }}-backend
+          ports:
+            - protocol: TCP
+              containerPort: 8000
+          volumeMounts:
+            - name: mediafiles
+              mountPath: /webprint/data/mediafiles
+          startupProbe:
+            httpGet:
+              port: 8000
+              path: /
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            failureThreshold: 1
+          livenessProbe:
+            httpGet:
+              port: 8000
+              path: /
+            failureThreshold: 3
+            periodSeconds: 20
+      volumes:
+        - name: mediafiles
+          persistentVolumeClaim:
+            claimName: {{ include "webprint.fullname" . }}-mediafiles-claim
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webprint.fullname" . }}-db
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: db
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "webprint.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/tier: db
+  template:
+    metadata:
+      name: {{ include "webprint.fullname" . }}-db
+      labels:
+        {{- include "webprint.labels" . | nindent 8 }}
+        app.kubernetes.io/tier: db
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: db
+          image: {{ .Values.images.db }}
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: {{ include "webprint.fullname" . }}-db
+          ports:
+            - protocol: TCP
+              containerPort: 5432
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          startupProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'SELECT 1'
+            initialDelaySeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            failureThreshold: 1
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'SELECT 1'
+            failureThreshold: 3
+            periodSeconds: 20
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "webprint.fullname" . }}-db-data-claim

@@ -51,3 +51,18 @@ Docker
   .. code-block:: sh
 
      docker-compose --env-file .env.docker up
+
+Kubernetes - Helm Chart
+=======================
+
+- Crie uma cópia do `k8s-config.yml.example` para `k8s-config.yml`, e faça sua configuração:
+
+  .. code-block:: sh
+
+     cp k8s-config.yml.example k8s-config.yml
+
+- Instale o chart no servidor kubernetes:
+
+  .. code-block:: sh
+
+     helm -n <namespace> install --values=k8s-config.yml webprint ./chart/webprint/

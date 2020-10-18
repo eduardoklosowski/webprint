@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "webprint.fullname" . }}-migrate
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+spec:
+  template:
+    metadata:
+      name: {{ include "webprint.fullname" . }}-migrate
+      labels:
+        {{- include "webprint.labels" . | nindent 8 }}
+        app.kubernetes.io/tier: backend
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: {{ .Values.images.backend }}
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: {{ include "webprint.fullname" . }}-backend
+            - configMapRef:
+                name: {{ include "webprint.fullname" . }}-backend
+          command: ["./manage.py", "migrate"]
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "webprint.fullname" . }}-deleteoldprints
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+spec:
+  schedule: 10 * * * *
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    metadata:
+      name: {{ include "webprint.fullname" . }}-deleteoldprints
+      labels:
+        {{- include "webprint.labels" . | nindent 8 }}
+        app.kubernetes.io/tier: backend
+    spec:
+      template:
+        metadata:
+          name: {{ include "webprint.fullname" . }}-deleteoldprints
+          labels:
+            {{- include "webprint.labels" . | nindent 12 }}
+            app.kubernetes.io/tier: backend
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: deleteoldprints
+              image: {{ .Values.images.backend }}
+              imagePullPolicy: Always
+              envFrom:
+                - secretRef:
+                    name: {{ include "webprint.fullname" . }}-backend
+                    optional: false
+                - configMapRef:
+                    name: {{ include "webprint.fullname" . }}-backend
+                    optional: false
+              command: ["./manage.py", "deleteoldprints"]

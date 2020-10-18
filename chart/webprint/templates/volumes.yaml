@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "webprint.fullname" . }}-mediafiles-claim
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+spec:
+  storageClassName: {{ .Values.volumes.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.volumes.mediafiles }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "webprint.fullname" . }}-db-data-claim
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: db
+spec:
+  storageClassName: {{ .Values.volumes.storageClassName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.volumes.db_data }}

@@ -1,0 +1,25 @@
+host: ""
+
+images:
+  proxy: eduardoklosowski/webprint-proxy:latest
+  backend: eduardoklosowski/webprint-backend:latest
+  db: postgres:13-alpine
+
+volumes:
+  storageClassName: standard
+  mediafiles: 1Gi
+  db_data: 1Gi
+
+proxy:
+  replicaCount: 1
+
+backend:
+  replicaCount: 1
+  secretKey: ""
+  languageCode: en-us
+  timeZone: UTC
+
+db:
+  user: postgres
+  password: postgres
+  database: webprint

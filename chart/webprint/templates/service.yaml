@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "webprint.fullname" . }}-proxy
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: proxy
+spec:
+  selector:
+    {{- include "webprint.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/tier: proxy
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "webprint.fullname" . }}-backend
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+spec:
+  selector:
+    {{- include "webprint.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "webprint.fullname" . }}-db
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: db
+spec:
+  selector:
+    {{- include "webprint.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/tier: db
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

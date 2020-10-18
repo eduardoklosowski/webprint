@@ -11,6 +11,7 @@ __pycache__/
 # Env
 /.env
 /.env.docker
+/k8s-config.yml
 /data/
 /db.sqlite3
 /staticfiles/

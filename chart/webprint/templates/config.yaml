@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "webprint.fullname" . }}-db
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: db
+type: Opaque
+stringData:
+  POSTGRES_USER: {{ .Values.db.user }}
+  POSTGRES_PASSWORD: {{ .Values.db.password }}
+  POSTGRES_DB: {{ .Values.db.database }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "webprint.fullname" . }}-backend
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+type: Opaque
+stringData:
+  SECRET_KEY: {{ .Values.backend.secretKey }}
+  DATABASE_URL: postgres://{{ .Values.db.user }}:{{ .Values.db.password }}@{{ include "webprint.fullname" . }}-db:5432/{{ .Values.db.database }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "webprint.fullname" . }}-backend
+  labels:
+    {{- include "webprint.labels" . | nindent 4 }}
+    app.kubernetes.io/tier: backend
+data:
+  LANGUAGE_CODE: {{ .Values.backend.languageCode }}
+  TIME_ZONE: {{ .Values.backend.timeZone }}
