@@ -95,3 +95,5 @@ STATIC_ROOT = Path(environ.get('STATIC_ROOT', BASE_DIR / 'staticfiles')).resolve
 STATIC_URL = '/static/'
 MEDIA_ROOT = Path(environ.get('MEDIA_ROOT', BASE_DIR / 'mediafiles')).resolve()
 MEDIA_URL = '/media/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
