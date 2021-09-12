@@ -155,7 +155,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'SELECT 1'
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
             initialDelaySeconds: 5
             failureThreshold: 6
           readinessProbe:
@@ -167,7 +167,7 @@ spec:
               command:
                 - /bin/sh
                 - -c
-                - psql -U $POSTGRES_USER -d $POSTGRES_DB -c 'SELECT 1'
+                - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
             failureThreshold: 3
             periodSeconds: 20
       volumes:
