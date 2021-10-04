@@ -17,3 +17,7 @@
 /db.sqlite3
 /staticfiles
 /mediafiles
+
+# Kubernetes
+/chart
+/k8s-config.yml

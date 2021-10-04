@@ -3,7 +3,7 @@ host: ""
 images:
   proxy: eduardoklosowski/webprint-proxy:latest
   backend: eduardoklosowski/webprint-backend:latest
-  db: postgres:13-alpine
+  db: postgres:14-alpine
 
 volumes:
   storageClassName: standard

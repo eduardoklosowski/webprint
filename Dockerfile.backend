@@ -1,6 +1,6 @@
-FROM python:3.8-slim AS builder
+FROM python:3.8-slim-bullseye AS builder
 
-RUN pip install 'poetry>=1.0.0,<2'
+RUN pip install --no-cache-dir 'poetry>=1.0.0,<2'
 
 RUN mkdir /webprint
 WORKDIR /webprint
@@ -11,26 +11,25 @@ RUN poetry export -E pgsql > requirements.txt
 
 # Image
 
-FROM python:3.8-slim
+FROM python:3.8-slim-bullseye
 
-ENV PYTHONUNBUFFERED=1
+RUN pip install --no-cache-dir 'gunicorn>=20.0.0,<21'
 
-RUN pip install 'gunicorn>=20.0.0,<21'
-
-RUN mkdir /webprint
+RUN mkdir /webprint \
+ && mkdir /webprint/data
 WORKDIR /webprint
 
 COPY --from=builder /webprint/requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-ENV DATABASE_URL=sqlite:////webprint/data/db.sqlite3 \
+ENV PYTHONUNBUFFERED=1 \
+    DATABASE_URL=sqlite:////webprint/data/db.sqlite3 \
     MEDIA_ROOT=/webprint/data/mediafiles
 
+COPY manage.py ./
 COPY project ./project
 COPY webprint ./webprint
-COPY manage.py ./
-RUN python -m compileall . \
- && mkdir data
+RUN python -m compileall .
 
 EXPOSE 8000
 
