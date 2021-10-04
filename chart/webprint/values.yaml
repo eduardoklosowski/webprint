@@ -1,9 +1,9 @@
 host: ""
 
 images:
-  proxy: eduardoklosowski/webprint-proxy:v0.2.0
-  backend: eduardoklosowski/webprint-backend:v0.2.0
-  db: postgres:13-alpine
+  proxy: eduardoklosowski/webprint-proxy:v0.2.1
+  backend: eduardoklosowski/webprint-backend:v0.2.1
+  db: postgres:14-alpine
 
 volumes:
   storageClassName: standard

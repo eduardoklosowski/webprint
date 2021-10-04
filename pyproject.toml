@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "webprint"
-version = "0.2.0"
+version = "0.2.1"
 description = "Compartilhador de prints e imagens"
 authors = ["Eduardo Klosowski <eduardo_klosowski@yahoo.com>"]
 readme = "README.rst"
